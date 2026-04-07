@@ -6,11 +6,11 @@ from math import cos, radians
 from typing import Any
 
 from shapely import affinity
-from shapely.geometry import LineString, Polygon, mapping
+from shapely.geometry import LineString, Polygon, box, mapping
 
 
 def sqft_from_polygon(poly: Polygon) -> float:
-    """Approximate square feet from lon/lat polygon near centroid latitude."""
+    """Approximate square feet from a lon/lat polygon near its centroid latitude."""
     centroid_lat = poly.centroid.y
     m_per_deg_lat = 111_132
     m_per_deg_lon = 111_320 * cos(radians(centroid_lat))
@@ -19,26 +19,20 @@ def sqft_from_polygon(poly: Polygon) -> float:
 
 
 def split_backyard_from_parcel(parcel: Polygon, front_direction: str = "south") -> Polygon:
-    """Split parcel in half and return opposite side as backyard."""
+    """Split parcel into halves and return opposite side to likely front."""
     minx, miny, maxx, maxy = parcel.bounds
-    if front_direction in {"north", "south"}:
-        midy = (miny + maxy) / 2
-        return Polygon([
-            (minx, midy),
-            (maxx, midy),
-            (maxx, maxy if front_direction == "south" else midy),
-            (minx, maxy if front_direction == "south" else midy),
-        ]).intersection(parcel) if front_direction == "south" else Polygon([
-            (minx, miny),
-            (maxx, miny),
-            (maxx, midy),
-            (minx, midy),
-        ]).intersection(parcel)
     midx = (minx + maxx) / 2
-    if front_direction == "west":
-        candidate = Polygon([(midx, miny), (maxx, miny), (maxx, maxy), (midx, maxy)])
+    midy = (miny + maxy) / 2
+
+    if front_direction == "north":
+        candidate = box(minx, miny, maxx, midy)
+    elif front_direction == "south":
+        candidate = box(minx, midy, maxx, maxy)
+    elif front_direction == "east":
+        candidate = box(minx, miny, midx, maxy)
     else:
-        candidate = Polygon([(minx, miny), (midx, miny), (midx, maxy), (minx, maxy)])
+        candidate = box(midx, miny, maxx, maxy)
+
     return candidate.intersection(parcel)
 
 
@@ -46,6 +40,7 @@ def guess_front_from_road(parcel: Polygon, road: LineString | None) -> str:
     """Guess front yard orientation by nearest parcel edge to road."""
     if road is None:
         return "south"
+
     minx, miny, maxx, maxy = parcel.bounds
     edges: dict[str, LineString] = {
         "north": LineString([(minx, maxy), (maxx, maxy)]),

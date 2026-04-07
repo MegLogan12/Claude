@@ -111,6 +111,14 @@ cd backyard-intelligence-api
 pytest -q
 ```
 
+
+### Dockerized test run
+
+```bash
+cd backyard-intelligence-api
+docker compose run --rm api pytest -q
+```
+
 ---
 
 ## Confidence and honesty behavior

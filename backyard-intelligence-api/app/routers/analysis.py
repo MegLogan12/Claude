@@ -59,7 +59,7 @@ async def property_analyze(
     building = await building_service.lookup(geocode["latitude"], geocode["longitude"])
     road = await roads_service.nearest_road(geocode["latitude"], geocode["longitude"])
 
-    warnings = []
+    warnings: list[str] = []
     if not parcel:
         warnings.append("Parcel unavailable; analysis confidence reduced.")
     if not road:
@@ -82,6 +82,14 @@ async def property_analyze(
     if drainage_risk == "high":
         next_actions.insert(0, "Perform drainage evaluation before finalizing hardscape or turf.")
 
+    quality = 40
+    if parcel:
+        quality += 30
+    if building:
+        quality += 20
+    if road:
+        quality += 10
+
     return {
         "overall_summary": "Remote property analysis generated from aerial and GIS-derived signals.",
         "site_metrics": site_metrics,
@@ -96,5 +104,7 @@ async def property_analyze(
         ],
         "sales_recommendation": sales.model_dump(),
         "warnings": warnings + backyard["warnings"],
+        "fallback_used": backyard["fallback_used"],
+        "data_quality_score": min(100, quality),
         "next_best_actions": next_actions,
     }
