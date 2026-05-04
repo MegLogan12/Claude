@@ -74,3 +74,18 @@ PO → Takeoff → WorkOrder/WOLI → ServiceAppointment → AssignedResource/Se
 - Salesforce verification needed:
 - Risks introduced:
 - Next decision request:
+
+## 13) Source artifact dependency (blocking)
+This scaffold is **not** final implementation guidance until the following source artifacts are present and mapped line-by-line:
+- `LOVING_Everything_HTML_UI_v1.zip`
+- `12_html_v1_sf_map.csv`
+- `13_html_v1_action_map.csv`
+- `14_v1_object_readiness.md`
+
+Next required PR must:
+1. Add or reference the source artifacts in-repo.
+2. Replace `SOURCE_PACKAGE_MISSING` and placeholder mappings with real HTML-derived entries.
+3. Replace `Needs Salesforce verification` where metadata evidence is obtained.
+4. Keep changes docs-only unless explicitly approved for staged metadata scaffolding.
+
+Do not proceed to deployable UI build from this scaffold alone.

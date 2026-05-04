@@ -21,3 +21,8 @@ Documentation-only readiness controls for LOVING UI implementation. No deploymen
 - Missing source UI package or unmapped screens.
 - Unverified required fields/objects.
 - Any dependency on prohibited objects (`Coverage_Decision__c`, `Inventory_Movement__c`, premature `Inventory_Ticket__c`).
+
+## Blocking limitation (must clear before build execution)
+- Current matrices contain placeholders because source artifact package was unavailable in this repo snapshot.
+- These placeholders are scaffolding controls only and must not be treated as final implementation mapping.
+- Required follow-up PR must add/reference the source artifacts and replace placeholders with verified mappings.
